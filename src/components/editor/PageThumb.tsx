@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, RotateCw, Trash2, Copy } from "lucide-react";
+import { RotateCw, Trash2, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEditor } from "@/store/editorStore";
 import { getPdfjsDocument } from "@/lib/pdf/render";
@@ -85,9 +85,12 @@ export function PageThumb({ page, index, selected }: Props) {
       }}
       style={style}
       className={cn(
-        "group relative card p-2 cursor-pointer select-none transition-shadow",
+        "group relative card p-2 select-none transition-shadow cursor-grab active:cursor-grabbing",
         selected && "ring-2 ring-primary",
+        isDragging && "shadow-2xl",
       )}
+      {...attributes}
+      {...listeners}
       onClick={(e) => {
         const mode = e.metaKey || e.ctrlKey
           ? "toggle"
@@ -97,15 +100,6 @@ export function PageThumb({ page, index, selected }: Props) {
         selectPage(page.id, mode);
       }}
     >
-      <button
-        type="button"
-        className="absolute left-1 top-1 z-10 btn-icon !w-6 !h-6 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <GripVertical className="w-4 h-4" />
-      </button>
       <div
         className="bg-white rounded-md overflow-hidden mx-auto shadow-sm"
         style={{
@@ -123,6 +117,7 @@ export function PageThumb({ page, index, selected }: Props) {
           <button
             type="button"
             className="btn-icon !w-6 !h-6"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               rotatePages([page.id], 90);
@@ -134,6 +129,7 @@ export function PageThumb({ page, index, selected }: Props) {
           <button
             type="button"
             className="btn-icon !w-6 !h-6"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               duplicatePages([page.id]);
@@ -145,6 +141,7 @@ export function PageThumb({ page, index, selected }: Props) {
           <button
             type="button"
             className="btn-icon !w-6 !h-6 hover:!text-danger"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               deletePages([page.id]);
